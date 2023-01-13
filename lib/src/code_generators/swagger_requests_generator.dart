@@ -1,5 +1,6 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:collection/collection.dart';
+import 'package:markdown/markdown.dart';
 import 'package:recase/recase.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/swagger_generator_base.dart';
 import 'package:swagger_dart_code_generator/src/code_generators/swagger_models_generator.dart';
@@ -56,7 +57,8 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
       (c) => c
         ..methods.addAll([
           _generateCreateMethod(className, chopperClient),
-          ...allMethodsContent
+          _generateVersionGetter(swaggerRoot),
+          ...allMethodsContent,
         ])
         ..extend = Reference(kChopperService)
         ..docs.add(kServiceHeader)
@@ -97,6 +99,16 @@ class SwaggerRequestsGenerator extends SwaggerGeneratorBase {
             ..name = 'interceptors',
         ))
         ..body = Code(body),
+    );
+  }
+
+  Method _generateVersionGetter(SwaggerRoot swaggerRoot) {
+    return Method(
+      (m) => m
+        ..returns = Reference('String')
+        ..name = 'apiVersion'
+        ..type = MethodType.getter
+        ..body = Code('return "' + version + '";'),
     );
   }
 
